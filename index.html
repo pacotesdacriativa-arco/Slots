@@ -3,114 +3,183 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sorteador VIP de Prêmios</title>
-  <!-- Efeito Visual de Confetes -->
+  <title>Painel de Sorteios VIP iGaming</title>
+  <!-- Biblioteca de Confetes -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-    body { background: #121214; color: #fff; display: flex; justify-content: center; padding: 20px 10px; min-height: 100vh; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background: #0f0f13; color: #fff; display: flex; justify-content: center; padding: 15px; min-height: 100vh; }
     
-    .app-container { width: 100%; max-width: 480px; background: #1e1e24; border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
-    h1 { text-align: center; font-size: 1.5rem; color: #ffcc00; margin-bottom: 5px; }
-    p.subtitle { text-align: center; font-size: 0.85rem; color: #aaa; margin-bottom: 20px; }
+    .app-container { width: 100%; max-width: 480px; background: #18181f; border-radius: 24px; padding: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.7); border: 1px solid #2a2a38; }
+    
+    h1 { text-align: center; font-size: 1.4rem; color: #ffcc00; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+    p.subtitle { text-align: center; font-size: 0.8rem; color: #999; margin-bottom: 20px; }
 
-    /* QUADRADOS DAS CATEGORIAS */
+    /* MENU DE CATEGORIAS */
     .grid-categories { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
-    .card-cat { background: #2a2a35; border: 2px solid #3a3a4c; border-radius: 15px; padding: 15px 10px; text-align: center; cursor: pointer; transition: all 0.2s ease; display: flex; flex-direction: column; align-items: center; gap: 8px; }
-    .card-cat:active { transform: scale(0.95); }
-    .card-cat.selected { border-color: #ffcc00; background: #343446; box-shadow: 0 0 15px rgba(255, 204, 0, 0.4); }
-    .card-cat .icon { font-size: 2.2rem; }
-    .card-cat .title { font-size: 0.95rem; font-weight: bold; }
+    .card-cat { background: #22222d; border: 2px solid #333345; border-radius: 16px; padding: 14px 10px; text-align: center; cursor: pointer; transition: all 0.2s ease; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .card-cat:active { transform: scale(0.96); }
+    .card-cat.selected { border-color: var(--theme-color); background: #2a2a3d; box-shadow: 0 0 15px var(--theme-glow); }
+    .card-cat .icon { font-size: 2rem; }
+    .card-cat .title { font-size: 0.88rem; font-weight: bold; color: #eee; }
 
-    /* ÁREA DO SORTEIO */
-    .draw-section { display: none; }
-    .category-banner { background: #ffcc00; color: #000; text-align: center; padding: 12px; border-radius: 12px; font-weight: bold; font-size: 1.1rem; margin-bottom: 15px; text-transform: uppercase; }
-    textarea { width: 100%; height: 130px; background: #121214; border: 2px solid #3a3a4c; border-radius: 12px; color: #fff; padding: 12px; font-size: 0.9rem; resize: none; outline: none; margin-bottom: 12px; }
-    textarea:focus { border-color: #ffcc00; }
-    
-    .btn-draw { width: 100%; background: linear-gradient(135deg, #ffcc00, #ff8800); border: none; border-radius: 12px; padding: 16px; color: #000; font-size: 1.2rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(255, 136, 0, 0.4); }
+    /* ÁREA DO SORTEIO PERSONALIZADA */
+    .draw-section { display: none; background: var(--theme-bg); border: 2px solid var(--theme-color); border-radius: 20px; padding: 16px; animation: fadeIn 0.3s forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .category-header { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 12px; }
+    .category-header img { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; border: 2px solid var(--theme-color); }
+    .category-header h3 { font-size: 1rem; color: var(--theme-color); text-transform: uppercase; }
+    .category-header p { font-size: 0.75rem; color: #ccc; }
+
+    label { font-size: 0.8rem; color: #ddd; display: block; margin-bottom: 6px; font-weight: 600; }
+    textarea { width: 100%; height: 110px; background: #111116; border: 2px solid #333; border-radius: 12px; color: #fff; padding: 10px; font-size: 0.85rem; resize: none; outline: none; margin-bottom: 12px; }
+    textarea:focus { border-color: var(--theme-color); }
+
+    .btn-draw { width: 100%; background: var(--theme-color); border: none; border-radius: 12px; padding: 14px; color: #000; font-size: 1.1rem; font-weight: 900; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.4); text-transform: uppercase; }
     .btn-draw:active { transform: scale(0.98); }
 
-    /* RESULTADO DO SORTEIO */
-    .result-box { margin-top: 20px; background: #121214; border: 2px dashed #ffcc00; border-radius: 15px; padding: 20px; text-align: center; display: none; }
-    .result-title { font-size: 0.85rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
-    .winner-id { font-size: 1.8rem; font-weight: 900; color: #ffcc00; margin: 10px 0; word-break: break-all; }
-    .roulette-anim { font-size: 1.5rem; color: #00e676; font-weight: bold; animation: pulse 0.1s infinite; }
-    @keyframes pulse { 0% { opacity: 0.3; } 100% { opacity: 1; } }
+    .btn-back { background: transparent; border: none; color: #aaa; font-size: 0.8rem; width: 100%; margin-top: 12px; cursor: pointer; text-align: center; }
+    .btn-back:hover { color: #fff; }
+
+    /* RESULTADO E ROLETA */
+    .result-box { margin-top: 15px; background: #111116; border: 2px dashed var(--theme-color); border-radius: 14px; padding: 15px; text-align: center; display: none; }
+    .result-title { font-size: 0.75rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
+    .winner-id { font-size: 1.6rem; font-weight: 900; color: var(--theme-color); margin: 8px 0; word-break: break-all; }
+    .roulette-anim { font-size: 1.3rem; color: #00e676; font-weight: bold; animation: pulse 0.08s infinite; }
+    @keyframes pulse { 0% { opacity: 0.2; } 100% { opacity: 1; } }
   </style>
 </head>
 <body>
 
   <div class="app-container">
-    <h1>🎰 Painel de Sorteios VIP</h1>
-    <p class="subtitle">Escolha a categoria do sorteio de hoje:</p>
+    <h1>🎰 Sorteios VIP</h1>
+    <p class="subtitle">Selecione o prêmio para abrir a roleta temática</p>
 
-    <!-- QUADRADOS DAS CATEGORIAS -->
-    <div class="grid-categories">
-      <div class="card-cat" onclick="selectCategory('Vale Pizza 🍕')"><span class="icon">🍕</span><span class="title">Vale Pizza</span></div>
-      <div class="card-cat" onclick="selectCategory('Vale Açaí 🍧')"><span class="icon">🍧</span><span class="title">Vale Açaí</span></div>
-      <div class="card-cat" onclick="selectCategory('Vale Pix 💸')"><span class="icon">💸</span><span class="title">Vale Pix</span></div>
-      <div class="card-cat" onclick="selectCategory('Vale iFood 🍔')"><span class="icon">🍔</span><span class="title">Vale iFood</span></div>
-      <div class="card-cat" onclick="selectCategory('Vale Almoço 🥗')"><span class="icon">🥗</span><span class="title">Vale Almoço</span></div>
-      <div class="card-cat" onclick="selectCategory('Vale Sushi 🍣')"><span class="icon">🍣</span><span class="title">Vale Sushi</span></div>
-      <div class="card-cat" style="grid-column: span 2;" onclick="selectCategory('Sorteio Comum 🎁')"><span class="icon">🎁</span><span class="title">Sorteio Comum</span></div>
+    <!-- MENU DE CATEGORIAS -->
+    <div class="grid-categories" id="menuGrid">
+      <div class="card-cat" onclick="openCategory('pizza', 'Vale Pizza 🍕', '#ff5252', 'rgba(255,82,82,0.3)', '#2b1515', 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=150')">
+        <span class="icon">🍕</span><span class="title">Vale Pizza</span>
+      </div>
+      <div class="card-cat" onclick="openCategory('acai', 'Vale Açaí 🍧', '#ab47bc', 'rgba(171,71,188,0.3)', '#221426', 'https://images.unsplash.com/photo-1590301157890-4810ed352733?w=150')">
+        <span class="icon">🍧</span><span class="title">Vale Açaí</span>
+      </div>
+      <div class="card-cat" onclick="openCategory('pix', 'Vale Pix 💸', '#00e676', 'rgba(0,230,118,0.3)', '#11261a', 'https://images.unsplash.com/photo-1621416894569-0f39ed31d247?w=150')">
+        <span class="icon">💸</span><span class="title">Vale Pix</span>
+      </div>
+      <div class="card-cat" onclick="openCategory('ifood', 'Vale iFood 🍔', '#ff7043', 'rgba(255,112,67,0.3)', '#2b1a15', 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=150')">
+        <span class="icon">🍔</span><span class="title">Vale iFood</span>
+      </div>
+      <div class="card-cat" onclick="openCategory('almoco', 'Vale Almoço 🥗', '#26a69a', 'rgba(38,166,154,0.3)', '#112422', 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=150')">
+        <span class="icon">🥗</span><span class="title">Vale Almoço</span>
+      </div>
+      <div class="card-cat" onclick="openCategory('sushi', 'Vale Sushi 🍣', '#ec407a', 'rgba(236,64,122,0.3)', '#2b131c', 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=150')">
+        <span class="icon">🍣</span><span class="title">Vale Sushi</span>
+      </div>
+      <div class="card-cat" style="grid-column: span 2;" onclick="openCategory('comum', 'Sorteio Comum 🎁', '#ffcc00', 'rgba(255,204,0,0.3)', '#292410', 'https://images.unsplash.com/photo-1513885535751-8b9238bd345a?w=150')">
+        <span class="icon">🎁</span><span class="title">Sorteio Comum Geral</span>
+      </div>
     </div>
 
-    <!-- ÁREA DE SORTEIO -->
+    <!-- PAINEL DA CATEGORIA SELECIONADA -->
     <div class="draw-section" id="drawSection">
-      <div class="category-banner" id="bannerText">PRÊMIO SELECIONADO</div>
-      <textarea id="idList" placeholder="Cole aqui a lista inteira de IDs do grupo...&#10;Exemplo:&#10;ID 94820&#10;ID 10293&#10;ID 48201"></textarea>
-      <button class="btn-draw" onclick="startDraw()">SORTEAR AGORA 🎲</button>
+      <div class="category-header">
+        <img id="catImg" src="" alt="Mascote">
+        <div>
+          <h3 id="catTitleName">Prêmio</h3>
+          <p>Cole a lista do grupo e rode a roleta!</p>
+        </div>
+      </div>
+
+      <label>Cole a lista de IDs abaixo:</label>
+      <textarea id="idList" placeholder="Exemplo:&#10;ID 94820&#10;ID 10293&#10;ID 48201"></textarea>
+
+      <button class="btn-draw" onclick="startDraw()">GIRAR ROLETA 🎲</button>
 
       <div class="result-box" id="resultBox">
         <div class="result-title" id="resultTitle">SORTEANDO...</div>
         <div class="winner-id" id="winnerDisplay">...</div>
       </div>
+
+      <button class="btn-back" onclick="goBack()">⬅ Escolher Outro Prêmio</button>
     </div>
   </div>
 
   <script>
-    let currentCategory = "";
+    let activeCategoryName = "";
 
-    function selectCategory(name) {
-      currentCategory = name;
-      document.querySelectorAll('.card-cat').forEach(c => c.classList.remove('selected'));
-      event.currentTarget.classList.add('selected');
+    function openCategory(id, name, color, glow, bg, imgUrl) {
+      activeCategoryName = name;
+      
+      // Aplicar variáveis de cores temáticas personalizadas
+      const root = document.documentElement;
+      root.style.setProperty('--theme-color', color);
+      root.style.setProperty('--theme-glow', glow);
+      root.style.setProperty('--theme-bg', bg);
 
-      document.getElementById('bannerText').innerText = `PRÊMIO: ${name}`;
+      // Preencher dados do cabeçalho
+      document.getElementById('catTitleName').innerText = name;
+      document.getElementById('catImg').src = imgUrl;
+
+      // Esconder menu e mostrar painel
+      document.getElementById('menuGrid').style.display = 'none';
       document.getElementById('drawSection').style.display = 'block';
       document.getElementById('resultBox').style.display = 'none';
-      document.getElementById('drawSection').scrollIntoView({ behavior: 'smooth' });
+      document.getElementById('idList').value = '';
+    }
+
+    function goBack() {
+      document.getElementById('drawSection').style.display = 'none';
+      document.getElementById('menuGrid').style.display = 'grid';
     }
 
     function startDraw() {
       const rawText = document.getElementById('idList').value.trim();
-      if (!rawText) return alert("Por favor, cole a lista de IDs antes de sortear!");
+      if (!rawText) {
+        alert("Por favor, cole a lista de IDs enviada pelo pessoal no grupo!");
+        return;
+      }
 
+      // Separar por linha de forma limpa
       const ids = rawText.split('\n').map(id => id.trim()).filter(id => id.length > 0);
-      if (ids.length === 0) return alert("Nenhum ID válido encontrado!");
+      if (ids.length === 0) {
+        alert("Nenhum ID válido encontrado na lista informada.");
+        return;
+      }
 
       const resultBox = document.getElementById('resultBox');
       const winnerDisplay = document.getElementById('winnerDisplay');
       const resultTitle = document.getElementById('resultTitle');
 
       resultBox.style.display = 'block';
-      resultTitle.innerText = "SORTEANDO GANHADOR...";
+      resultTitle.innerText = "ROLETA GIRANDO...";
       winnerDisplay.classList.add('roulette-anim');
 
-      let counter = 0, speed = 60, duration = 2500;
+      let counter = 0;
+      const speed = 50; 
+      const duration = 2200; 
+
       const interval = setInterval(() => {
-        winnerDisplay.innerText = ids[Math.floor(Math.random() * ids.length)];
+        const randomTempIndex = Math.floor(Math.random() * ids.length);
+        winnerDisplay.innerText = ids[randomTempIndex];
         counter += speed;
 
         if (counter >= duration) {
           clearInterval(interval);
-          const winner = ids[Math.floor(Math.random() * ids.length)];
+          
+          const finalWinnerIndex = Math.floor(Math.random() * ids.length);
+          const winner = ids[finalWinnerIndex];
+
           winnerDisplay.classList.remove('roulette-anim');
-          resultTitle.innerText = `🎉 GANHADOR DO ${currentCategory.toUpperCase()}! 🎉`;
+          resultTitle.innerText = `🎉 VENCEDOR(A) DO ${activeCategoryName.toUpperCase()}! 🎉`;
           winnerDisplay.innerText = winner;
 
-          confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 } });
+          // Disparar confetes festivos na tela
+          confetti({
+            particleCount: 130,
+            spread: 80,
+            origin: { y: 0.6 }
+          });
         }
       }, speed);
     }
